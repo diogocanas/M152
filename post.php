@@ -8,6 +8,8 @@
  * Version          : 1.0
  */
 
+require_once 'php/inc.all.php';
+
 $messagePost = filter_input(INPUT_POST, 'messagePost', FILTER_SANITIZE_STRING);
 $imagePost = filter_input(INPUT_POST, 'imagePost', FILTER_SANITIZE_STRING);
 $btnValidPost = filter_input(INPUT_POST, 'btnValidPost');
@@ -32,13 +34,21 @@ $btnValidPost = filter_input(INPUT_POST, 'btnValidPost');
             </div>
             <div class="form-group">
                 <label for="imagePost">Choisir une image :</label>
-                <input type="file" class="form-control-file" id="imagePost" name="imagePost" accept="image/*">
+                <input type="file" class="form-control-file" id="imagePost" name="imagePost" accept="image/*" multiple>
             </div>
             <button class="btn btn-primary" type="submit" name="btnValidPost">Valider</button>
         </form>
         <?php
             if (isset($btnValidPost)) {
-                echo $_FILES['imagePost']['name'];
+                if ($_FILES['imagePost']['name'] != "") {
+                    if ($messagePost != "") {
+                        saveAllPost($messagePost, date('Y-m-d H:i:s'), $_FILES['imagePost']);
+                    } else {
+                        echo "Veuillez ajouter un commentaire à votre média.";
+                    }
+                } else {
+                    echo "Veuillez choisir un média.";
+                }
             }
         ?>
     </div>

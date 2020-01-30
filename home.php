@@ -7,6 +7,8 @@
  * Description      : Page d'accueil de l'application
  * Version          : 1.0
  */
+
+require_once 'php/inc.all.php';
 ?>
 <!doctype html>
 <html lang="en">
