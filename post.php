@@ -11,7 +11,6 @@
 require_once 'php/inc.all.php';
 
 $messagePost = filter_input(INPUT_POST, 'messagePost', FILTER_SANITIZE_STRING);
-$imagePost = filter_input(INPUT_POST, 'imagePost', FILTER_SANITIZE_STRING);
 $btnValidPost = filter_input(INPUT_POST, 'btnValidPost');
 ?>
 <!doctype html>
@@ -40,15 +39,19 @@ $btnValidPost = filter_input(INPUT_POST, 'btnValidPost');
         </form>
         <?php
             if (isset($btnValidPost)) {
-                if ($_FILES['imagePost']['name'] != "") {
-                    if ($messagePost != "") {
-                        saveAllPost($messagePost, date('Y-m-d H:i:s'), $_FILES['imagePost']);
-                    } else {
-                        echo "Veuillez ajouter un commentaire à votre média.";
+                if (strpos($_FILES['imagePost']['type'], 'image') !== false) {
+                    if (convertBytesToMegaBytes($_FILES['imagePost']['size']) <= 3) {
+                        if (!doesImageExist($_FILES['imagePost']['name'])) {
+                            $uploads_dir = 'img';
+                            $name = $_FILES['imagePost']['name'];
+                            move_uploaded_file($_FILES['imagePost']['tmp_name'], "$uploads_dir/$name");
+                        }
                     }
-                } else {
-                    echo "Veuillez choisir un média.";
+                    
                 }
+                saveAllPost($messagePost, date('Y-m-d H:i:s'), $_FILES['imagePost']);
+
+                
             }
         ?>
     </div>

@@ -11,6 +11,7 @@
 /**
  * @brief   Fonction qui enregistre un post dans la base de données
  * @param   $commentaire    ==> Message du post
+ * @param   $date           ==> Date du post
  */
 function createPost($commentaire, $date) {
     $db = Database::GetInstance();
@@ -28,7 +29,9 @@ function createPost($commentaire, $date) {
 
 /**
  * @brief   Fonction qui enregistre un ou plusieurs média(s) dans la base de données
- * @param   $image    ==> Tableau d'images en $_FILES
+ * @param   $images     ==> Tableau d'images en $_FILES
+ * @param   $date       ==> Date du post
+ * @param   $idPost     ==> Id du post
  */
 function createMedia($images, $date, $idPost) {
     $db = Database::GetInstance();
@@ -51,9 +54,13 @@ function createMedia($images, $date, $idPost) {
     }
 }
 
+/**
+ * @brief   Fonction qui récupère l'id du post qui correspond aux images
+ */
 function getIdByMessageAndDate($commentaire, $date) {
     $db = Database::GetInstance();
 
+    $date .= '.0';
     try {
         $sql = "SELECT idPost FROM post WHERE commentaire LIKE :commentaire AND creationDate LIKE :creationDate";
         $stmt = $db->prepare($sql);
@@ -72,6 +79,28 @@ function saveAllPost($commentaire, $date, $images) {
     createPost($commentaire, $date);
     $idPost = getIdByMessageAndDate($commentaire, $date);
     createMedia($images, $date, $idPost);
+}
+
+function doesImageExist($imageName) {
+    $db = Database::GetInstance();
+    $doesExist = false;
+
+    try {
+        $sql = "SELECT nomMedia FROM media";
+        $stmt = $db->prepare($sql);
+        $stmt->execute();
+        while ($row=$stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            if ($row['nomMedia'] == $imageName) {
+                $doesExist = true;
+                break;
+            } else {
+                $doesExist = false;
+            }
+        }
+        return $doesExist;
+    } catch (PDOException $e) {
+        die("Erreur : " . $e->getMessage());
+    }
 }
 
 /**
