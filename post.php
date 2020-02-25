@@ -33,25 +33,25 @@ $btnValidPost = filter_input(INPUT_POST, 'btnValidPost');
             </div>
             <div class="form-group">
                 <label for="imagePost">Choisir une image :</label>
-                <input type="file" class="form-control-file" id="imagePost" name="imagePost" accept="image/*" multiple>
+                <input type="file" class="form-control-file" id="imagePost" name="imagePost[]" accept="image/*" multiple>
             </div>
             <button class="btn btn-primary" type="submit" name="btnValidPost">Valider</button>
         </form>
         <?php
             if (isset($btnValidPost)) {
-                if (strpos($_FILES['imagePost']['type'], 'image') !== false) {
-                    if (convertBytesToMegaBytes($_FILES['imagePost']['size']) <= 3) {
-                        if (!doesImageExist($_FILES['imagePost']['name'])) {
-                            $uploads_dir = 'img';
-                            $name = $_FILES['imagePost']['name'];
-                            move_uploaded_file($_FILES['imagePost']['tmp_name'], "$uploads_dir/$name");
+                $countfiles = count($_FILES['imagePost']['name']);
+                for ($i = 0; $i < $countfiles; $i++){
+                    if (strpos($_FILES['imagePost']['type'][$i], 'image') !== false) {
+                        if (convertBytesToMegaBytes($_FILES['imagePost']['size'][$i]) <= 3) {
+                            if (!doesImageExist($_FILES['imagePost']['name'][$i])) {
+                                $uploads_dir = 'img';
+                                $name = $_FILES['imagePost']['name'][$i];
+                                move_uploaded_file($_FILES['imagePost']['tmp_name'][$i], "$uploads_dir/$name");
+                            }
                         }
                     }
-                    
                 }
                 saveAllPost($messagePost, date('Y-m-d H:i:s'), $_FILES['imagePost']);
-
-                
             }
         ?>
     </div>

@@ -36,11 +36,11 @@ function createPost($commentaire, $date) {
 function createMedia($images, $date, $idPost) {
     $db = Database::GetInstance();
 
-    foreach ($images as $image) {
+    for ($i = 0; $i < count($images['name']); $i++) {
         try {
-            $imageType = $images['type'];
-            $imageName = $images['name'];
-
+            $imageType = $images['type'][$i];
+            $imageName = $images['name'][$i];
+    
             $sql = "INSERT INTO media(typeMedia, nomMedia, creationDate, post_idPost) VALUES(:typeMedia, :nomMedia, :creationDate, :post_idPost)";
             $stmt = $db->prepare($sql);
             $stmt->bindParam(":typeMedia", $imageType, PDO::PARAM_STR);
