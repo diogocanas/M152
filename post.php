@@ -12,6 +12,9 @@ require_once 'php/inc.all.php';
 
 $messagePost = filter_input(INPUT_POST, 'messagePost', FILTER_SANITIZE_STRING);
 $btnValidPost = filter_input(INPUT_POST, 'btnValidPost');
+if (!isset($_SESSION['imgValid'])) {
+    $_SESSION['imgValid'] = array();
+  }
 ?>
 <!doctype html>
 <html lang="en">
@@ -39,19 +42,14 @@ $btnValidPost = filter_input(INPUT_POST, 'btnValidPost');
         </form>
         <?php
             if (isset($btnValidPost)) {
-                $countfiles = count($_FILES['imagePost']['name']);
-                for ($i = 0; $i < $countfiles; $i++){
-                    if (strpos($_FILES['imagePost']['type'][$i], 'image') !== false) {
-                        if (convertBytesToMegaBytes($_FILES['imagePost']['size'][$i]) <= 3) {
-                            if (!doesImageExist($_FILES['imagePost']['name'][$i])) {
-                                $uploads_dir = 'img';
-                                $name = $_FILES['imagePost']['name'][$i];
-                                move_uploaded_file($_FILES['imagePost']['tmp_name'][$i], "$uploads_dir/$name");
-                            }
-                        }
+                if (!in_array(false, $_SESSION['imgValid'])) {
+                    $_SESSION['imgValid'] = array();
+                    if ($messagePost !== "") {
+                        saveAllPost($messagePost, date('Y-m-d H:i:s'), $_FILES['imagePost']);
                     }
+                } else {
+                    echo "Erreur";
                 }
-                saveAllPost($messagePost, date('Y-m-d H:i:s'), $_FILES['imagePost']);
             }
         ?>
     </div>
