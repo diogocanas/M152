@@ -37,8 +37,8 @@ function saveAllPost($commentaire, $date, $images) {
             $stmt->bindParam(":creationDate", $date, PDO::PARAM_STR);
             $stmt->bindParam(":post_idPost", $idPost, PDO::PARAM_INT);
             moveFiles($images);
+            $stmt->execute();
         }
-        $stmt->execute();
         Database::GetInstance()->commit();
     } catch (PDOException $e) {
         Database::GetInstance()->rollBack();
@@ -52,7 +52,7 @@ function saveAllPost($commentaire, $date, $images) {
 function moveFiles($images) {
     $countfiles = count($images['name']);
         for ($i = 0; $i < $countfiles; $i++){
-            if (strpos($images['type'][$i], 'image') !== false) {
+            if (strpos($images['type'][$i], 'image') !== false || strpos($images['type'][$i], 'video') !== false) {
                 if (convertBytesToMegaBytes($images['size'][$i]) <= 3) {
                     if (!doesImageExist($images['name'][$i])) {
                         $uploads_dir = './img';
@@ -81,7 +81,7 @@ function getAllPostsAndMedias() {
     $medias = array();
 
     try {
-        $sql = "SELECT post.idPost, post.commentaire, post.creationDate, media.nomMedia, media.post_idPost FROM post INNER JOIN media ON post.idPost = media.post_idPost";
+        $sql = "SELECT post.idPost, post.commentaire, post.creationDate, media.nomMedia, media.post_idPost, media.typeMedia FROM post INNER JOIN media ON post.idPost = media.post_idPost ORDER BY post.creationDate DESC";
         $stmt = $db->prepare($sql);
         $stmt->execute();
         while ($row=$stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
@@ -93,7 +93,7 @@ function getAllPostsAndMedias() {
                     array_push($posts, array($row['idPost'], $row['commentaire'], $row['creationDate']));
                 }
             }
-            array_push($medias, array($row['nomMedia'], $row['post_idPost']));
+            array_push($medias, array($row['nomMedia'], $row['post_idPost'], $row['typeMedia']));
         }
         return array($posts, $medias);
     } catch (PDOException $e) {

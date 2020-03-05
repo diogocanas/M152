@@ -39,18 +39,28 @@ if (!isset($_SESSION['imgValid'])) {
       foreach ($posts as $post) {
       ?>
         <div class="card" style="width: 18rem;">
+          <?php
+          foreach ($medias as $media) {
+            if ($media[1] == $post[0]) {
+              $type = $media[2];
+              if (strpos($type, "image") !== false) {
+          ?>
+                <img src=<?= "img/$media[0]" ?> class="card-img-top" alt="">
               <?php
-              foreach ($medias as $media) {
-                if ($media[1] == $post[0]) {
-                  $mediaName = $media[0];
+              } else if (strpos($type, "video") !== false) {
               ?>
-                <img src=<?= "img/$mediaName" ?> class="card-img-top" alt="...">
-              <?php
-                }
+                <video id="video" controls autoplay loop>
+                  <source src="<?= "img/$media[0]" ?>" type="<?= $media[2] ?>">
+                </video>
+          <?php
               }
-              ?>
+            }
+          }
+          ?>
           <div class="card-body">
-            <p class="card-text"><?= $post[1] ?></p>
+            <p class="card-text"><?= $post[1] ?></br><?= $post[2] ?></p>
+            <button type="button" class="btn btn-primary">Modifier</button>
+            <button type="button" class="btn btn-danger">Supprimer</button>
           </div>
         </div>
       <?php
@@ -65,5 +75,4 @@ if (!isset($_SESSION['imgValid'])) {
   include_once('html/js.php');
   ?>
 </body>
-
 </html>
