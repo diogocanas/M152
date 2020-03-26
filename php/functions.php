@@ -47,33 +47,71 @@ function saveAllPost($commentaire, $date, $images) {
 }
 
 /**
+ * @brief   Fonction qui supprime le post correspondant à l'id passé en paramètre
+ * @param   $idPost         ==> Id du post à supprimer
+ */
+function deletePost($idPost) {
+    $db = Database::GetInstance();
+    $medias = getAllPostsAndMedias()[1];
+    Database::GetInstance()->beginTransaction();
+
+    try {
+        $sql = "DELETE FROM media WHERE post_idPost = :idPost";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(":idPost", $idPost, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $sql = "DELETE FROM post WHERE idPost = :idPost";
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(":idPost", $idPost, PDO::PARAM_INT);
+        $stmt->execute();
+        deleteFiles($idPost, $medias);
+        Database::GetInstance()->commit();
+    } catch (PDOException $e) {
+        Database::GetInstance()->rollBack();
+        die("Erreur : " . $e->getMessage());
+    }
+}
+
+/**
  * @brief   Fonction qui déplace l'image dans un dossier donné
+ * @param   $images         ==> Images 
  */
 function moveFiles($images) {
     $countfiles = count($images['name']);
-        for ($i = 0; $i < $countfiles; $i++){
-            if (strpos($images['type'][$i], 'image') !== false || strpos($images['type'][$i], 'video') !== false || strpos($images['type'][$i], 'audio') !== false) {
-                if (convertBytesToMegaBytes($images['size'][$i]) <= 3) {
-                    if (!doesImageExist($images['name'][$i])) {
-                        $uploads_dir = './img';
-                        $name = $images['name'][$i];
-                        move_uploaded_file($images['tmp_name'][$i], "$uploads_dir/$name");
-                        array_push($_SESSION['imgValid'], true);
-                    } else {
-                        array_push($_SESSION['imgValid'], false);
-                    }
+    for ($i = 0; $i < $countfiles; $i++){
+        if (strpos($images['type'][$i], 'image') !== false || strpos($images['type'][$i], 'video') !== false || strpos($images['type'][$i], 'audio') !== false) {
+            if (convertBytesToMegaBytes($images['size'][$i]) <= 3) {
+                if (!doesImageExist($images['name'][$i])) {
+                    $uploads_dir = './img';
+                    $name = $images['name'][$i];
+                    move_uploaded_file($images['tmp_name'][$i], "$uploads_dir/$name");
+                    array_push($_SESSION['imgValid'], true);
                 } else {
                     array_push($_SESSION['imgValid'], false);
                 }
             } else {
                 array_push($_SESSION['imgValid'], false);
             }
+        } else {
+            array_push($_SESSION['imgValid'], false);
         }
+    }
+}
+
+function deleteFiles($idPost, $medias) {
+    foreach ($medias as $media) {
+        if ($media[1] == $idPost) {
+            unlink("./img/$media[0]");
+        }
+    }
 }
 
 /**
  * @brief   Fonction qui récupère les informations des posts
  * @return  array   ==> Informations des posts et des medias
+ *                      [0] => POSTS
+ *                      [1] => MEDIAS
  */
 function getAllPostsAndMedias() {
     $db = Database::GetInstance();

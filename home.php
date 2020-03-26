@@ -13,6 +13,7 @@ require_once 'php/inc.all.php';
 $posts_medias = getAllPostsAndMedias();
 $posts = $posts_medias[0];
 $medias = $posts_medias[1];
+$btnDeletePost = FILTER_INPUT(INPUT_POST, "btnDeletePost");
 if (!isset($_SESSION['imgValid'])) {
   $_SESSION['imgValid'] = array();
 }
@@ -65,8 +66,17 @@ if (!isset($_SESSION['imgValid'])) {
           ?>
           <div class="card-body">
             <p class="card-text"><?= $post[1] ?></br><?= $post[2] ?></p>
-            <button type="button" class="btn btn-primary">Modifier</button>
-            <button type="button" class="btn btn-danger">Supprimer</button>
+            <form method="POST" action="home.php">
+              <button type="button" class="btn btn-primary">Modifier</button>
+              <button type="submit" class="btn btn-danger" name="btnDeletePost">Supprimer</button>
+            </form>
+            <?php
+              if (isset($btnDeletePost)) {
+                deletePost($post[0]);
+                header('Location: home.php');
+                exit();
+              }
+            ?>
           </div>
         </div>
       <?php
