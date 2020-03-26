@@ -49,10 +49,16 @@ if (!isset($_SESSION['imgValid'])) {
               <?php
               } else if (strpos($type, "video") !== false) {
               ?>
-                <video id="video" controls autoplay loop>
+                <video controls autoplay loop class="card-img-top" alt="">
                   <source src="<?= "img/$media[0]" ?>" type="<?= $media[2] ?>">
                 </video>
           <?php
+              } else if (strpos($type, "audio") !== false) {
+                ?>
+                  <audio controls>
+                    <source src="<?= "img/$media[0]" ?>" type="<?= $media[2] ?>">
+                  </audio>
+                <?php
               }
             }
           }

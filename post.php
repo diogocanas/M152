@@ -36,7 +36,7 @@ if (!isset($_SESSION['imgValid'])) {
             </div>
             <div class="form-group">
                 <label for="imagePost">Choisir une image :</label>
-                <input type="file" class="form-control-file" id="imagePost" name="imagePost[]" accept="image/*, video/*" multiple>
+                <input type="file" class="form-control-file" id="imagePost" name="imagePost[]" accept="image/*,video/*,audio/*" multiple>
             </div>
             <button class="btn btn-primary" type="submit" name="btnValidPost">Valider</button>
         </form>

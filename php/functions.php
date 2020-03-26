@@ -52,7 +52,7 @@ function saveAllPost($commentaire, $date, $images) {
 function moveFiles($images) {
     $countfiles = count($images['name']);
         for ($i = 0; $i < $countfiles; $i++){
-            if (strpos($images['type'][$i], 'image') !== false || strpos($images['type'][$i], 'video') !== false) {
+            if (strpos($images['type'][$i], 'image') !== false || strpos($images['type'][$i], 'video') !== false || strpos($images['type'][$i], 'audio') !== false) {
                 if (convertBytesToMegaBytes($images['size'][$i]) <= 3) {
                     if (!doesImageExist($images['name'][$i])) {
                         $uploads_dir = './img';
@@ -91,6 +91,7 @@ function getAllPostsAndMedias() {
             foreach ($posts as $post) {
                 if ($post[0] != $row['idPost']) {
                     array_push($posts, array($row['idPost'], $row['commentaire'], $row['creationDate']));
+                    break;
                 }
             }
             array_push($medias, array($row['nomMedia'], $row['post_idPost'], $row['typeMedia']));
